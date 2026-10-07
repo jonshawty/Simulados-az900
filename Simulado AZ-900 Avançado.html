@@ -1,0 +1,880 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Simulado AZ-900 Avançado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* layout concept: same exam console as the base simulado, extended with three question
+   formats (scenario single-choice, yes/no statement batteries, multi-select) */
+:root{
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface-2:#f0efec; --surface-3:#e7e6e1;
+  --fg:#0b0b0b; --fg-muted:#52514e; --fg-faint:#898781;
+  --border:rgba(11,11,11,0.12); --border-strong:rgba(11,11,11,0.22);
+  --accent:#2a78d6; --accent-soft:#cde2fb; --accent-ink:#0d366b;
+  --cloud:#2a78d6; --cloud-ink:#ffffff;
+  --arch:#c05524; --arch-ink:#ffffff;
+  --gov:#128a60; --gov-ink:#ffffff;
+  --good:#0ca30c; --good-soft:#dcf3dc;
+  --warning:#9a6b00; --warning-soft:#fdecc6;
+  --critical:#d03b3b; --critical-soft:#fbdede;
+  --radius:12px;
+  --font-display:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-body:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#232321; --surface-3:#2c2c2a;
+    --fg:#ffffff; --fg-muted:#c3c2b7; --fg-faint:#8f8d85;
+    --border:rgba(255,255,255,0.14); --border-strong:rgba(255,255,255,0.28);
+    --accent:#3987e5; --accent-soft:#184f95; --accent-ink:#dce9fb;
+    --cloud:#3987e5; --cloud-ink:#071321;
+    --arch:#e07a44; --arch-ink:#2a1200;
+    --gov:#2fae82; --gov-ink:#04150f;
+    --good:#2fc92f; --good-soft:#123018;
+    --warning:#f0b429; --warning-soft:#3a2d08;
+    --critical:#e66767; --critical-soft:#3a1414;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#232321; --surface-3:#2c2c2a;
+  --fg:#ffffff; --fg-muted:#c3c2b7; --fg-faint:#8f8d85;
+  --border:rgba(255,255,255,0.14); --border-strong:rgba(255,255,255,0.28);
+  --accent:#3987e5; --accent-soft:#184f95; --accent-ink:#dce9fb;
+  --cloud:#3987e5; --cloud-ink:#071321;
+  --arch:#e07a44; --arch-ink:#2a1200;
+  --gov:#2fae82; --gov-ink:#04150f;
+  --good:#2fc92f; --good-soft:#123018;
+  --warning:#f0b429; --warning-soft:#3a2d08;
+  --critical:#e66767; --critical-soft:#3a1414;
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--fg); font-family:var(--font-body); margin:0; line-height:1.5}
+.wrap{max-width:1040px; margin:0 auto; padding-inline:16px; padding-block:20px 48px}
+h1,h2,h3{font-family:var(--font-display); font-weight:700; letter-spacing:-0.01em; text-wrap:balance; margin:0}
+.mono{font-family:var(--font-display)}
+.tabular{font-variant-numeric:tabular-nums}
+button{font:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+
+/* ---------- intro ---------- */
+.intro{display:flex; flex-direction:column; gap:22px; padding-block:12px}
+.eyebrow{font-family:var(--font-display); font-size:12px; letter-spacing:.09em; text-transform:uppercase; color:var(--accent)}
+.intro h1{font-size:clamp(26px,5vw,38px)}
+.intro p.lead{color:var(--fg-muted); max-width:62ch; font-size:16px}
+.stat-row{display:flex; flex-wrap:wrap; gap:12px}
+.stat-tile{flex:1 1 140px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px}
+.stat-tile .v{font-family:var(--font-display); font-size:20px; font-weight:700}
+.stat-tile .l{color:var(--fg-muted); font-size:13px; margin-top:2px}
+.format-legend{display:flex; flex-direction:column; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px}
+.format-row{display:flex; align-items:baseline; gap:10px; font-size:14px}
+.format-row b{font-family:var(--font-display); font-size:12px; color:var(--accent); flex:none; width:150px}
+.domain-legend{display:flex; flex-direction:column; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px}
+.domain-row{display:flex; align-items:center; gap:10px; font-size:14px}
+.domain-row .sw{width:12px; height:12px; border-radius:3px; flex:none}
+.domain-row .pct{margin-left:auto; color:var(--fg-muted); font-family:var(--font-display); font-size:13px}
+.rules{color:var(--fg-muted); font-size:14px; max-width:62ch}
+.rules li{margin-block:4px}
+.btn{border-radius:999px; border:1px solid var(--border-strong); padding:12px 22px; font-weight:600; font-size:15px; background:var(--surface); color:var(--fg)}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn[disabled]{opacity:.4; cursor:not-allowed}
+
+/* ---------- exam shell ---------- */
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; margin-bottom:16px; flex-wrap:wrap}
+.topbar .title{font-weight:700; font-size:14px}
+.pill{font-family:var(--font-display); font-size:13px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:5px 12px}
+.pill.timer{margin-left:auto}
+.pill.timer.low{background:var(--critical-soft); color:var(--critical); border-color:transparent}
+.layout{display:grid; grid-template-columns:220px 1fr; gap:18px; align-items:start}
+@media (max-width:760px){ .layout{grid-template-columns:1fr} .rail-desktop{display:none} }
+.rail{position:sticky; top:calc(64px + env(safe-area-inset-top,0px)); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; max-height:calc(100vh - 100px); overflow:auto}
+.rail h3{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-faint); margin-bottom:10px}
+.nav-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+.qcol{min-width:0}
+.nav-strip{display:none; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:14px}
+@media (max-width:760px){ .nav-strip{display:flex} }
+.nq{width:34px; height:34px; flex:none; border-radius:8px; border:1px solid var(--border-strong); background:var(--surface); color:var(--fg-muted); font-family:var(--font-display); font-size:12px; display:flex; align-items:center; justify-content:center}
+.nq.answered{background:var(--accent-soft); color:var(--accent-ink); border-color:transparent}
+.nq.current{border-color:var(--accent); border-width:2px; color:var(--fg); font-weight:700}
+.legend-mini{display:flex; gap:12px; margin-top:12px; font-size:11px; color:var(--fg-faint); flex-wrap:wrap}
+.legend-mini span{display:inline-flex; align-items:center; gap:5px}
+.legend-mini i{width:9px; height:9px; border-radius:3px; display:inline-block; background:var(--surface-3)}
+.legend-mini i.on{background:var(--accent-soft)}
+
+.qcard{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; min-width:0}
+.qmeta{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap}
+.tag{font-family:var(--font-display); font-size:11px; letter-spacing:.04em; text-transform:uppercase; padding:4px 10px; border-radius:999px; font-weight:600; white-space:nowrap; flex:none}
+.tag.cloud{background:var(--cloud); color:var(--cloud-ink)}
+.tag.arch{background:var(--arch); color:var(--arch-ink)}
+.tag.gov{background:var(--gov); color:var(--gov-ink)}
+.tag.fmt{background:var(--surface-3); color:var(--fg-muted)}
+.qnum{color:var(--fg-faint); font-family:var(--font-display); font-size:13px}
+.qtext{font-size:18px; font-weight:500; max-width:64ch; margin-bottom:14px}
+.scenario{color:var(--fg-muted); font-size:14.5px; background:var(--surface-2); border-radius:8px; padding:12px 14px; margin-bottom:16px; max-width:64ch}
+.hint{font-size:12.5px; color:var(--fg-faint); margin:-6px 0 14px}
+.options{display:flex; flex-direction:column; gap:10px}
+.option{display:flex; align-items:flex-start; gap:12px; border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:var(--surface)}
+.option:hover{background:var(--surface-2)}
+.option input{margin-top:3px; accent-color:var(--accent); flex:none}
+.option .letter{font-family:var(--font-display); font-weight:700; color:var(--fg-faint); flex:none}
+.option.selected{border-color:var(--accent); background:var(--accent-soft)}
+.option.selected .letter{color:var(--accent-ink)}
+.option.correct{border-color:var(--good); background:var(--good-soft)}
+.option.incorrect{border-color:var(--critical); background:var(--critical-soft)}
+.option-text{min-width:0}
+.statement-row{display:flex; align-items:center; gap:14px; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; flex-wrap:wrap}
+.statement-row .stext{flex:1 1 260px; min-width:0; font-size:14.5px}
+.yn{display:flex; gap:6px; flex:none}
+.yn button{border:1px solid var(--border-strong); background:var(--surface); color:var(--fg-muted); border-radius:8px; padding:7px 16px; font-weight:600; font-size:13px}
+.yn button.active-yes{background:var(--good-soft); color:var(--good); border-color:transparent}
+.yn button.active-no{background:var(--critical-soft); color:var(--critical); border-color:transparent}
+.statement-row.review-ok{border-color:var(--good)}
+.statement-row.review-no{border-color:var(--critical)}
+.stwhy{flex-basis:100%; font-size:13px; color:var(--fg-faint); margin-top:4px}
+.footer-actions{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap}
+.footer-actions .spacer{flex:1 1 auto}
+
+/* ---------- modal ---------- */
+.modal-overlay{position:fixed; inset:0; background:rgba(11,11,11,0.5); display:flex; align-items:center; justify-content:center; padding:16px; z-index:20}
+.modal{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; max-width:420px; width:100%}
+.modal h3{font-size:17px; margin-bottom:8px}
+.modal p{color:var(--fg-muted); font-size:14px; margin:0 0 18px}
+.modal .row{display:flex; gap:10px; justify-content:flex-end}
+
+/* ---------- results ---------- */
+.results{display:flex; flex-direction:column; gap:22px}
+.score-hero{display:flex; align-items:center; gap:22px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; flex-wrap:wrap}
+.ring{width:118px; height:118px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; background:conic-gradient(var(--accent) calc(var(--pct)*1%), var(--surface-3) 0)}
+.ring-inner{width:92px; height:92px; border-radius:50%; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center}
+.ring-inner .n{font-family:var(--font-display); font-size:24px; font-weight:700}
+.ring-inner .d{font-size:10px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.06em}
+.score-info{min-width:200px}
+.status-chip{display:inline-flex; align-items:center; gap:7px; font-family:var(--font-display); font-weight:700; font-size:14px; padding:6px 14px; border-radius:999px; margin-bottom:8px}
+.status-chip.pass{background:var(--good-soft); color:var(--good)}
+.status-chip.fail{background:var(--critical-soft); color:var(--critical)}
+.score-info .detail{color:var(--fg-muted); font-size:14px; max-width:48ch}
+.note{color:var(--fg-faint); font-size:12.5px; max-width:70ch}
+.domain-bars{display:flex; flex-direction:column; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px}
+.bar-row{display:grid; grid-template-columns:190px 1fr 90px; gap:12px; align-items:center}
+@media (max-width:560px){ .bar-row{grid-template-columns:1fr; gap:6px} .bar-row .barnum{text-align:left} }
+.bar-row .label{display:flex; align-items:center; gap:8px; font-size:13.5px; min-width:0}
+.bar-row .label i{width:10px; height:10px; border-radius:3px; flex:none}
+.bar-track{height:10px; border-radius:999px; background:var(--surface-3); overflow:hidden}
+.bar-fill{height:100%; border-radius:999px}
+.bar-fill.good{background:var(--good)}
+.bar-fill.warning{background:var(--warning)}
+.bar-fill.critical{background:var(--critical)}
+.barnum{font-family:var(--font-display); font-size:13px; text-align:right}
+.status-legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--fg-faint); margin-top:4px}
+.status-legend span{display:inline-flex; align-items:center; gap:6px}
+.status-legend i{width:9px; height:9px; border-radius:3px}
+
+.review-list{display:flex; flex-direction:column; gap:10px}
+.review-list h2{font-size:20px}
+details.review-item{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px 16px}
+details.review-item[open]{padding-bottom:16px}
+summary{cursor:pointer; padding-block:12px; display:flex; align-items:center; gap:10px; list-style:none; font-size:14.5px}
+summary::-webkit-details-marker{display:none}
+summary .mark{font-weight:700; flex:none; width:20px; text-align:center}
+summary .mark.ok{color:var(--good)}
+summary .mark.no{color:var(--critical)}
+summary .tag{font-size:10px; padding:3px 8px}
+summary .sumtext{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--fg-muted)}
+.review-body .qtext{font-size:15px; margin-top:4px}
+.review-answers{font-size:13.5px; display:flex; flex-direction:column; gap:4px; margin:12px 0}
+.review-answers .yours.wrong{color:var(--critical)}
+.review-answers .yours.right{color:var(--good)}
+.review-answers .correct-line{color:var(--good)}
+.explanation{background:var(--surface-2); border-radius:8px; padding:12px 14px; font-size:13.5px; color:var(--fg-muted)}
+.explanation b{color:var(--fg); font-family:var(--font-display); font-size:11px; text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:5px}
+[hidden]{display:none !important}
+</style>
+
+<div class="wrap">
+
+  <!-- ================= INTRO ================= -->
+  <section id="screen-intro" class="intro">
+    <div>
+      <div class="eyebrow">Microsoft Certified · Fundamentals · Nível avançado</div>
+      <h1>Simulado AZ-900 Avançado</h1>
+      <p class="lead">Versão mais próxima da prova real: cenários aplicados, baterias de afirmação Sim/Não e questões de múltipla seleção, com distratores mais próximos entre si. Pensado para quem já foi bem no simulado básico e quer medir o nível de verdade.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile"><div class="v mono tabular">50</div><div class="l">itens no total</div></div>
+      <div class="stat-tile"><div class="v mono tabular">75 min</div><div class="l">tempo sugerido</div></div>
+      <div class="stat-tile"><div class="v mono tabular">700/1000</div><div class="l">nota mínima real</div></div>
+      <div class="stat-tile"><div class="v mono tabular">3</div><div class="l">formatos de questão</div></div>
+    </div>
+
+    <div class="format-legend">
+      <div class="format-row"><b>Cenário</b> 30 questões de múltipla escolha com uma situação a resolver e alternativas da mesma categoria, mais difíceis de distinguir por eliminação.</div>
+      <div class="format-row"><b>Sim / Não</b> 10 blocos com 3 afirmações cada sobre um mesmo cenário — a questão só conta como certa se as 3 forem avaliadas corretamente.</div>
+      <div class="format-row"><b>Múltipla seleção</b> 10 questões em que é preciso marcar exatamente o conjunto certo de alternativas, nem a mais nem a menos.</div>
+    </div>
+
+    <div class="domain-legend">
+      <div class="domain-row"><span class="sw" style="background:var(--cloud)"></span> Conceitos de nuvem <span class="pct">14 itens · 28%</span></div>
+      <div class="domain-row"><span class="sw" style="background:var(--arch)"></span> Arquitetura e serviços do Azure <span class="pct">19 itens · 38%</span></div>
+      <div class="domain-row"><span class="sw" style="background:var(--gov)"></span> Gerenciamento e governança do Azure <span class="pct">17 itens · 34%</span></div>
+    </div>
+
+    <ul class="rules">
+      <li>A ordem dos itens é sorteada a cada tentativa — refaça quantas vezes quiser.</li>
+      <li>Nas afirmações Sim/Não, leia o cenário com atenção: as três perguntas tratam do mesmo contexto.</li>
+      <li>Nas de múltipla seleção, o enunciado informa quantas alternativas marcar.</li>
+      <li>O cronômetro finaliza o simulado automaticamente ao chegar a zero.</li>
+    </ul>
+
+    <div>
+      <button class="btn btn-primary" id="btn-start">Iniciar simulado avançado</button>
+    </div>
+  </section>
+
+  <!-- ================= EXAM ================= -->
+  <section id="screen-exam" hidden>
+    <div class="topbar">
+      <span class="title mono">AZ-900+</span>
+      <span class="pill" id="progress-pill">0/50 respondidas</span>
+      <span class="pill timer mono tabular" id="timer-pill">75:00</span>
+      <button class="btn btn-primary" id="btn-finish" style="padding:8px 16px; font-size:13px">Finalizar simulado</button>
+    </div>
+
+    <div class="layout">
+      <aside class="rail rail-desktop">
+        <h3>Questões</h3>
+        <div class="nav-grid" id="nav-grid"></div>
+        <div class="legend-mini">
+          <span><i></i> não respondida</span>
+          <span><i class="on"></i> respondida</span>
+        </div>
+      </aside>
+
+      <div class="qcol">
+        <div class="nav-strip" id="nav-strip"></div>
+        <div class="qcard">
+          <div class="qmeta">
+            <span class="tag" id="q-tag"></span>
+            <span class="tag fmt" id="q-fmt"></span>
+            <span class="qnum mono tabular" id="q-num"></span>
+          </div>
+          <div class="qtext" id="q-text"></div>
+          <div id="q-body"></div>
+          <div class="footer-actions">
+            <button class="btn" id="btn-prev">← Anterior</button>
+            <button class="btn" id="btn-next">Próxima →</button>
+            <span class="spacer"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  <section id="screen-results" hidden>
+    <div class="results">
+      <div class="score-hero">
+        <div class="ring" id="score-ring" style="--pct:0">
+          <div class="ring-inner">
+            <div class="n tabular" id="score-pct">0%</div>
+            <div class="d" id="score-frac">0/50</div>
+          </div>
+        </div>
+        <div class="score-info">
+          <div class="status-chip" id="status-chip">—</div>
+          <div class="detail" id="score-detail"></div>
+        </div>
+      </div>
+      <p class="note">A prova real pontua em escala de 1 a 1000 com nota de corte 700; o percentual acima é uma referência aproximada. Nas afirmações Sim/Não e nas de múltipla seleção, o item só conta como acerto quando TODAS as partes estão corretas — igual ao critério mais rigoroso da prova real.</p>
+
+      <div class="domain-bars" id="domain-bars">
+        <h3 style="font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--fg-faint)">Desempenho por domínio</h3>
+        <div id="bars-holder"></div>
+        <div class="status-legend">
+          <span><i style="background:var(--good)"></i> ≥ 70% dominado</span>
+          <span><i style="background:var(--warning)"></i> 50–69% a reforçar</span>
+          <span><i style="background:var(--critical)"></i> &lt; 50% revisar com atenção</span>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn btn-primary" id="btn-review">Ver revisão completa</button>
+        <button class="btn" id="btn-retry">Refazer simulado</button>
+      </div>
+
+      <div class="review-list" id="review-list" hidden>
+        <h2>Revisão dos 50 itens</h2>
+        <div id="review-holder"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODAL ================= -->
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div class="modal">
+      <h3>Finalizar simulado?</h3>
+      <p id="modal-text">Você respondeu 0 de 50 itens.</p>
+      <div class="row">
+        <button class="btn" id="modal-cancel">Continuar respondendo</button>
+        <button class="btn btn-primary" id="modal-confirm">Finalizar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+/* ===== CLOUD — single (8) ===== */
+{domain:'cloud', type:'single', q:'Uma startup quer pagar apenas pelos servidores que usa, sem investir em hardware próprio, mas também não quer gerenciar nada além do código da sua aplicação. Qual modelo de serviço é mais adequado?', options:['IaaS','PaaS','SaaS','Virtualização on-premises'], correct:1, exp:'PaaS abstrai o sistema operacional, o runtime e o middleware, deixando a equipe focada apenas no código e nos dados — diferente do IaaS, que ainda exige gerenciar o SO, e do SaaS, que não permite desenvolver uma aplicação própria.'},
+{domain:'cloud', type:'single', q:'Uma empresa de varejo tem pico de vendas apenas na Black Friday e quer evitar pagar por capacidade ociosa o resto do ano. Qual característica da nuvem resolve esse problema?', options:['Elasticidade','Alta disponibilidade','Tolerância a falhas','Governança centralizada'], correct:0, exp:'Elasticidade permite que os recursos cresçam automaticamente no pico e diminuam depois, evitando pagar por capacidade ociosa — alta disponibilidade trata de manter o serviço no ar, não de ajustar custo à demanda.'},
+{domain:'cloud', type:'single', q:'Uma empresa quer manter seu data center local para dados sensíveis, mas também usar a nuvem pública para cargas de trabalho de baixo risco cuja demanda varia bastante. Qual modelo de nuvem atende esse cenário?', options:['Multicloud','Nuvem híbrida','Nuvem privada','Nuvem comunitária'], correct:1, exp:'A nuvem híbrida combina ambientes on-premises com a nuvem pública, permitindo manter dados sensíveis localmente e usar a elasticidade da nuvem pública para o restante.'},
+{domain:'cloud', type:'single', q:'Um banco de investimento contrata uma infraestrutura isolada de outros clientes, hospedada por um provedor terceirizado, para uso exclusivo do banco. Isso caracteriza:', options:['Nuvem pública','Nuvem privada','Nuvem híbrida','IaaS compartilhado entre clientes'], correct:1, exp:'Mesmo hospedada por um terceiro, a infraestrutura dedicada exclusivamente a uma única organização caracteriza nuvem privada, não pública.'},
+{domain:'cloud', type:'single', q:'Uma empresa para de comprar servidores físicos e passa a pagar uma assinatura mensal de VMs conforme o uso. Do ponto de vista financeiro, isso representa uma mudança de:', options:['OpEx para CapEx','CapEx para OpEx','Depreciação para amortização','Lucro para receita'], correct:1, exp:'Investir em servidores próprios é CapEx (despesa de capital); pagar por uso contínuo é OpEx (despesa operacional) — o sentido da migração para nuvem pública.'},
+{domain:'cloud', type:'single', q:'Uma aplicação crítica precisa continuar no ar mesmo se um único data center dentro de uma região Azure falhar completamente. Qual abordagem de arquitetura melhor atende esse requisito?', options:['Aumentar o tamanho de uma única VM (escalabilidade vertical)','Distribuir a aplicação entre Zonas de Disponibilidade na mesma região','Confiar apenas no RAID local do disco da VM','Aumentar o número de núcleos de CPU da VM'], correct:1, exp:'Zonas de Disponibilidade são data centers fisicamente separados dentro da região, com energia e rede independentes — escalabilidade vertical e RAID local não protegem contra a perda de um data center inteiro.'},
+{domain:'cloud', type:'single', q:'Qual das opções a seguir é um exemplo do benefício "agilidade" da nuvem, e não de "alta disponibilidade"?', options:['Garantir 99,9% de SLA de uptime de um serviço','Provisionar um ambiente de testes completo em minutos e descartá-lo depois','Replicar dados entre duas regiões geográficas','Balancear tráfego entre múltiplas instâncias de um serviço'], correct:1, exp:'Agilidade é sobre a velocidade de provisionar e descartar recursos; as demais opções descrevem mecanismos de disponibilidade e resiliência, não de agilidade.'},
+{domain:'cloud', type:'single', q:'Uma equipe de desenvolvimento quer publicar código e deixar totalmente a cargo do provedor a escala, o patch do sistema operacional e o balanceamento de carga. Qual modelo de serviço atende melhor essa necessidade?', options:['IaaS','PaaS','SaaS','Virtualização on-premises'], correct:1, exp:'PaaS cuida do sistema operacional, do patching e da escala automaticamente, deixando a equipe livre para focar apenas no código.'},
+
+/* ===== ARCH — single (11) ===== */
+{domain:'arch', type:'single', q:'Uma empresa quer um ambiente de teste totalmente isolado de produção, mas ambos devem compartilhar a mesma cobrança consolidada da mesma assinatura. O que ela deve criar?', options:['Duas assinaturas separadas','Dois Grupos de Recursos diferentes dentro da mesma assinatura','Duas VNets na mesma região','Dois Grupos de Gerenciamento'], correct:1, exp:'Grupos de recursos isolam o ciclo de vida de conjuntos de recursos mantendo-os na mesma assinatura, compartilhando a cobrança consolidada.'},
+{domain:'arch', type:'single', q:'Uma organização com 15 assinaturas do Azure, uma por departamento, quer aplicar a mesma política de segurança a todas de uma vez, sem configurar cada assinatura individualmente. Qual recurso deve usar?', options:['Um Grupo de Recursos compartilhado','Tags em cada recurso','Um Grupo de Gerenciamento acima das assinaturas','Um Resource Lock em cada assinatura'], correct:2, exp:'Grupos de Gerenciamento ficam acima das assinaturas na hierarquia e permitem aplicar políticas a todas elas de uma só vez.'},
+{domain:'arch', type:'single', q:'Uma aplicação precisa processar picos imprevisíveis de milhares de tarefas curtas e independentes, sem que a equipe gerencie servidores. Qual opção de computação é mais adequada?', options:['Azure Virtual Machines dedicadas','Azure Kubernetes Service com cluster de tamanho fixo','Azure Functions','Azure Virtual Machine Scale Sets de tamanho fixo'], correct:2, exp:'Azure Functions escala automaticamente por evento e cobra por execução, ideal para picos imprevisíveis de tarefas curtas — diferente de um cluster ou scale set de tamanho fixo.'},
+{domain:'arch', type:'single', q:'Uma empresa precisa conectar o data center local ao Azure com a maior confiabilidade e a menor latência possível para uma carga crítica, sem depender da internet pública, e tem orçamento para uma conexão dedicada via parceiro de conectividade. Qual serviço escolher?', options:['Site-to-Site VPN','Point-to-Site VPN','Azure ExpressRoute','Azure Virtual WAN via internet pública'], correct:2, exp:'ExpressRoute estabelece uma conexão privada e dedicada entre o ambiente local e o Azure, sem passar pela internet pública — diferente das VPNs, que usam a internet com criptografia.'},
+{domain:'arch', type:'single', q:'Uma aplicação web precisa rotear o tráfego HTTP com base no caminho da URL (por exemplo, /api para um grupo de servidores e /imagens para outro) e fazer terminação SSL centralizada. Qual recurso é mais adequado — e não apenas um balanceador de camada 4 genérico?', options:['Azure Load Balancer','Azure Application Gateway','Azure ExpressRoute','Azure Bastion'], correct:1, exp:'O Application Gateway opera na camada 7 e oferece roteamento baseado em URL e terminação SSL; o Load Balancer tradicional atua na camada 4 e não enxerga caminhos de URL.'},
+{domain:'arch', type:'single', q:'Uma empresa quer um compartilhamento de arquivos via protocolo SMB que várias VMs possam montar simultaneamente, como uma unidade de rede tradicional. Qual serviço atende isso — e não apenas armazenamento de objetos?', options:['Azure Blob Storage','Azure Files','Azure Table Storage','Azure Queue Storage'], correct:1, exp:'Azure Files oferece compartilhamentos totalmente gerenciados acessíveis via SMB/NFS, montáveis por várias VMs ao mesmo tempo — diferente do Blob Storage, que é armazenamento de objetos.'},
+{domain:'arch', type:'single', q:'Dados de auditoria precisam ficar disponíveis com baixa latência de leitura, mas são acessados poucas vezes por mês ao longo de um ano. Qual camada de Blob Storage equilibra melhor custo de armazenamento e custo de acesso, comparada a Hot e Archive?', options:['Hot','Cool','Archive','Premium SSD'], correct:1, exp:'A camada Cool tem custo de armazenamento menor que a Hot e, ao contrário da Archive, mantém os dados com acesso imediato, sem necessidade de reidratação.'},
+{domain:'arch', type:'single', q:'Os dados de uma empresa precisam sobreviver mesmo que uma região inteira do Azure fique indisponível, e a empresa também precisa poder ler esses dados a partir da região secundária enquanto a primária estiver fora do ar. Qual opção de redundância atende exatamente esse requisito?', options:['LRS','ZRS','GRS','RA-GRS'], correct:3, exp:'RA-GRS replica para uma região secundária distante (como o GRS) e, diferente do GRS puro, permite leitura direta na secundária mesmo com a primária disponível.'},
+{domain:'arch', type:'single', q:'Um administrador quer garantir que apenas usuários que completem a verificação em duas etapas acessem recursos financeiros críticos, mesmo que já estejam dentro da rede corporativa. Qual abordagem segue o modelo Zero Trust?', options:['Confiar automaticamente por estar na rede interna e dispensar MFA','Exigir MFA e verificação explícita, independentemente da localização de rede','Aplicar MFA apenas a acessos externos à empresa','Usar apenas uma senha forte, sem camadas adicionais'], correct:1, exp:'Zero Trust nunca confia automaticamente, nem mesmo dentro da rede corporativa — toda solicitação exige verificação explícita.'},
+{domain:'arch', type:'single', q:'A equipe de segurança quer conceder a um fornecedor terceirizado permissão apenas para visualizar (nunca modificar) os recursos de um único grupo de recursos específico, sem acesso ao restante da assinatura. Qual é a forma correta de fazer isso?', options:['Compartilhar a senha do administrador da assinatura','Atribuir a função RBAC "Leitor" (Reader) sobre o grupo de recursos específico','Criar uma nova assinatura só para o fornecedor','Aplicar um Resource Lock do tipo ReadOnly na assinatura inteira'], correct:1, exp:'O RBAC permite escopo granular (um grupo de recursos específico) e papel limitado (somente leitura) — um Resource Lock impede ações para todos, mas não concede acesso.'},
+{domain:'arch', type:'single', q:'Qual cenário é um exemplo correto de "defesa em profundidade" sendo aplicada, e não apenas um único controle isolado?', options:['Usar somente um firewall de perímetro e nada mais','Combinar firewall de rede, MFA na identidade, criptografia dos dados em repouso e monitoramento contínuo','Confiar inteiramente na criptografia de disco como única proteção','Usar apenas Resource Locks para proteger todos os recursos'], correct:1, exp:'Defesa em profundidade combina múltiplas camadas independentes; depender de um único controle contraria o princípio central dessa estratégia.'},
+
+/* ===== GOV — single (11) ===== */
+{domain:'gov', type:'single', q:'Antes de migrar 200 VMs on-premises para o Azure, a diretoria pede uma comparação entre o custo atual do data center local e o custo projetado no Azure pelos próximos 5 anos. Qual ferramenta é mais adequada?', options:['Calculadora de Preços do Azure','Calculadora de TCO do Azure','Azure Advisor','Azure Cost Management + Billing'], correct:1, exp:'A Calculadora de TCO compara especificamente o custo de manter infraestrutura on-premises com o custo equivalente no Azure ao longo do tempo; a Calculadora de Preços estima apenas o custo dos recursos do Azure isoladamente.'},
+{domain:'gov', type:'single', q:'Depois de três meses usando o Azure, a equipe de FinOps quer identificar quais assinaturas estão gastando mais do que o esperado e configurar alertas quando um limite mensal for ultrapassado. Qual ferramenta usar?', options:['Azure Cost Management + Billing','Calculadora de Preços do Azure','Azure Blueprints','Azure Service Health'], correct:0, exp:'Azure Cost Management + Billing monitora gastos reais, analisa padrões de consumo e permite configurar orçamentos com alertas.'},
+{domain:'gov', type:'single', q:'Uma política da empresa exige que nenhuma VM seja criada fora da região Brasil Sul, em nenhuma assinatura. Qual recurso aplica e impõe automaticamente essa regra sobre recursos novos e existentes?', options:['Tags obrigatórias','Azure Policy','Resource Lock','Azure Advisor'], correct:1, exp:'Azure Policy avalia e impõe regras de conformidade, como restrição de região; Tags apenas organizam metadados e não bloqueiam ações; Resource Lock impede exclusão/alteração, não restringe região na criação.'},
+{domain:'gov', type:'single', q:'Um banco de dados de produção foi excluído acidentalmente por um engenheiro com permissão de Colaborador no grupo de recursos. A empresa quer evitar que isso se repita, sem reduzir as permissões normais da equipe. Qual recurso resolve isso diretamente?', options:['Remover todos os usuários do RBAC','Aplicar um Resource Lock do tipo CanNotDelete no recurso crítico','Criar uma nova assinatura','Aplicar uma Tag "crítico" no recurso'], correct:1, exp:'O bloqueio CanNotDelete impede a exclusão mesmo por quem tem permissão RBAC suficiente, sem alterar as permissões normais de trabalho da equipe.'},
+{domain:'gov', type:'single', q:'A área financeira quer que todo gasto do Azure seja automaticamente atribuído ao centro de custo correto de cada departamento nos relatórios, sem criar uma assinatura por departamento. O que a empresa deve aplicar aos recursos?', options:['Grupos de Gerenciamento por departamento','Tags com o nome do centro de custo em cada recurso','Um Resource Lock por departamento','Políticas de Azure Policy com efeito Deny'], correct:1, exp:'Tags permitem associar metadados, como centro de custo, aos recursos, possibilitando relatórios de custo segmentados sem precisar de uma assinatura por departamento.'},
+{domain:'gov', type:'single', q:'Antes de implantar um novo ambiente, a equipe de plataforma quer garantir que ele já nasça em conformidade, incluindo um conjunto padrão de políticas, atribuições de RBAC e modelos ARM, reutilizável em múltiplos projetos futuros. Qual recurso foi desenhado exatamente para esse propósito?', options:['Azure Advisor','Azure Blueprints','Azure Monitor','Azure Service Health'], correct:1, exp:'Azure Blueprints empacota artefatos como modelos ARM, políticas e atribuições de RBAC em um pacote reutilizável que garante conformidade desde a implantação.'},
+{domain:'gov', type:'single', q:'A equipe de operações quer saber se há alguma interrupção afetando especificamente os recursos usados pela assinatura da empresa agora mesmo, e não um status genérico de toda a nuvem Azure. Qual ferramenta responde isso?', options:['Azure Service Health','Azure Advisor','Azure Monitor','Azure Policy'], correct:0, exp:'Azure Service Health oferece um painel personalizado com incidentes e manutenções que afetam especificamente os recursos da assinatura do usuário.'},
+{domain:'gov', type:'single', q:'Uma equipe quer saber, com base no uso real da assinatura, se está pagando por VMs superdimensionadas que deveriam ser redimensionadas para economizar, além de receber sugestões de segurança a corrigir. Qual serviço entrega recomendações personalizadas assim?', options:['Azure Advisor','Azure Service Health','Azure Blueprints','Azure Resource Manager'], correct:0, exp:'Azure Advisor analisa configuração e uso real dos recursos e recomenda ações em custo, segurança, confiabilidade, desempenho e excelência operacional.'},
+{domain:'gov', type:'single', q:'Uma empresa opera servidores físicos próprios, VMs em outra nuvem pública e recursos no Azure, e quer aplicar as mesmas políticas de governança e monitoramento do Azure sobre todo esse ambiente heterogêneo, a partir de um único painel. Qual serviço permite isso?', options:['Azure Migrate','Azure Arc','Azure Site Recovery','Azure Data Box'], correct:1, exp:'Azure Arc estende o gerenciamento, a governança (incluindo Azure Policy) e o monitoramento do Azure para servidores on-premises e recursos em outras nuvens.'},
+{domain:'gov', type:'single', q:'Um time de DevOps quer implantar a mesma infraestrutura — rede, VMs, banco de dados — de forma idêntica e repetível em três ambientes (desenvolvimento, homologação, produção), versionando essa definição em um repositório de código. Qual abordagem é mais adequada?', options:['Criar cada ambiente manualmente pelo portal do Azure','Usar Modelos do Azure Resource Manager (ARM templates) como Infraestrutura como Código','Pedir ao Azure Advisor para gerar os ambientes','Copiar e colar configurações de VM uma a uma'], correct:1, exp:'Modelos ARM descrevem a infraestrutura desejada em arquivos JSON declarativos e versionáveis, permitindo implantações repetíveis e consistentes entre ambientes.'},
+{domain:'gov', type:'single', q:'A Microsoft define um SLA de disponibilidade de 99,9% para a configuração do Azure Blob Storage contratada pela empresa. Caso esse índice não seja cumprido em um mês, o que a empresa deve esperar, segundo o modelo de SLA da Microsoft?', options:['Reembolso automático e integral de todos os serviços do mês','Créditos de serviço proporcionais à violação, conforme os termos do SLA','Nenhuma compensação, pois o SLA é apenas uma meta informal','Troca automática e gratuita de toda a infraestrutura'], correct:1, exp:'Um SLA é um compromisso formal sobre disponibilidade mínima, com créditos de serviço oferecidos como compensação proporcional caso a meta não seja cumprida — não reembolso integral nem substituição de infraestrutura.'},
+
+/* ===== YES/NO batteries (10) ===== */
+{domain:'cloud', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa está avaliando se deve migrar para a nuvem pública.', statements:[
+  {text:'Na nuvem pública, a empresa se torna proprietária física dos servidores que utiliza.', answer:false, why:'Na nuvem pública, a infraestrutura física pertence ao provedor, não ao cliente.'},
+  {text:'O modelo de nuvem pública permite pagar apenas pelos recursos efetivamente consumidos (OpEx).', answer:true, why:'É o modelo de cobrança por consumo (pay-as-you-go), típico de OpEx.'},
+  {text:'A elasticidade da nuvem pública significa que os recursos, uma vez alocados, nunca podem ser reduzidos.', answer:false, why:'Elasticidade inclui tanto aumentar quanto reduzir recursos conforme a demanda.'}
+]},
+{domain:'cloud', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma equipe está comparando os modelos de serviço IaaS, PaaS e SaaS.', statements:[
+  {text:'No SaaS, o cliente é responsável por aplicar patches no sistema operacional.', answer:false, why:'No SaaS, o provedor cuida de toda a pilha, incluindo o sistema operacional.'},
+  {text:'No IaaS, o provedor gerencia a virtualização e a infraestrutura física, mas não o sistema operacional do cliente.', answer:true, why:'No IaaS, o cliente ainda administra o SO, o runtime e a aplicação.'},
+  {text:'No PaaS, o cliente não precisa gerenciar o runtime da aplicação, apenas o código e os dados.', answer:true, why:'PaaS abstrai o runtime e o middleware, deixando o cliente focado em código e dados.'}
+]},
+{domain:'cloud', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa quer entender a diferença entre alta disponibilidade, tolerância a falhas e escalabilidade.', statements:[
+  {text:'Alta disponibilidade garante que um sistema nunca terá nenhuma falha.', answer:false, why:'Alta disponibilidade busca minimizar o downtime, não eliminar falhas por completo.'},
+  {text:'Tolerância a falhas permite que um sistema continue operando mesmo com a falha de um componente.', answer:true, why:'É exatamente a definição de tolerância a falhas.'},
+  {text:'Escalabilidade horizontal (scale out) significa aumentar os recursos de uma única instância existente.', answer:false, why:'Isso descreve escalabilidade vertical (scale up); horizontal significa adicionar mais instâncias.'}
+]},
+{domain:'arch', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa está planejando a arquitetura de rede e resiliência de uma aplicação no Azure.', statements:[
+  {text:'Zonas de disponibilidade são data centers fisicamente separados dentro da mesma região.', answer:true, why:'Essa é a definição de Zona de Disponibilidade.'},
+  {text:'Duas VMs no mesmo grupo de recursos ficam automaticamente em zonas de disponibilidade diferentes, sem configuração adicional.', answer:false, why:'A zona precisa ser escolhida explicitamente na criação de cada VM.'},
+  {text:'O Azure ExpressRoute usa a internet pública para conectar o data center local ao Azure.', answer:false, why:'ExpressRoute é uma conexão privada via provedor de conectividade, sem passar pela internet pública.'}
+]},
+{domain:'arch', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma equipe está escolhendo entre opções de armazenamento e redundância.', statements:[
+  {text:'Azure Blob Storage é a opção recomendada para armazenar dados não estruturados, como imagens e vídeos.', answer:true, why:'Blob Storage é otimizado justamente para esse tipo de dado.'},
+  {text:'A camada Archive do Blob Storage oferece o menor custo de armazenamento, mas maior latência para recuperar os dados.', answer:true, why:'Archive prioriza custo mínimo de armazenamento em troca de um tempo de recuperação maior.'},
+  {text:'LRS (Locally Redundant Storage) protege os dados contra a perda completa de uma região inteira.', answer:false, why:'LRS replica apenas dentro de um único data center; não protege contra a perda da região.'}
+]},
+{domain:'arch', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma organização está revisando seus controles de identidade e segurança.', statements:[
+  {text:'A Autenticação Multifator (MFA) exige apenas uma senha para confirmar a identidade do usuário.', answer:false, why:'MFA exige pelo menos dois fatores, não apenas a senha.'},
+  {text:'O RBAC permite atribuir permissões específicas a um usuário sobre um grupo de recursos, sem dar acesso à assinatura inteira.', answer:true, why:'RBAC suporta escopos granulares, incluindo um grupo de recursos específico.'},
+  {text:'O modelo Zero Trust assume que qualquer dispositivo dentro da rede corporativa deve ser automaticamente confiável.', answer:false, why:'Zero Trust nunca confia automaticamente, mesmo dentro da rede corporativa.'}
+]},
+{domain:'arch', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa está decidindo como hospedar contêineres e código no Azure.', statements:[
+  {text:'O Azure Kubernetes Service (AKS) orquestra automaticamente o escalonamento e o balanceamento de múltiplos contêineres.', answer:true, why:'Essa é a função principal de um orquestrador como o AKS.'},
+  {text:'O Azure Container Instances (ACI) exige a criação de um cluster Kubernetes antes de executar um contêiner.', answer:false, why:'ACI executa contêineres isolados diretamente, sem precisar de um cluster.'},
+  {text:'Azure Functions pode executar código sob demanda sem que a equipe precise provisionar servidores manualmente.', answer:true, why:'Essa é a essência do modelo serverless do Azure Functions.'}
+]},
+{domain:'gov', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa está organizando a governança de custos e conformidade no Azure.', statements:[
+  {text:'O Azure Policy pode impedir a criação de recursos fora de uma região permitida.', answer:true, why:'Policy pode aplicar um efeito de negação (Deny) com base em condições como a região.'},
+  {text:'Tags são usadas para impor regras de conformidade e bloquear a criação de recursos não autorizados.', answer:false, why:'Tags são apenas metadados organizacionais; quem impõe regras é o Azure Policy.'},
+  {text:'Um Resource Lock do tipo ReadOnly impede que um recurso seja modificado, mesmo por um usuário com permissão de Colaborador.', answer:true, why:'O bloqueio ReadOnly se sobrepõe às permissões RBAC normais.'}
+]},
+{domain:'gov', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma equipe de operações está avaliando ferramentas de monitoramento e suporte do Azure.', statements:[
+  {text:'O Azure Service Health informa sobre interrupções que afetam especificamente os recursos da assinatura do usuário.', answer:true, why:'Service Health é personalizado para os recursos da assinatura do usuário.'},
+  {text:'O Azure Advisor recomenda ações apenas relacionadas à segurança, sem considerar custo ou desempenho.', answer:false, why:'O Advisor cobre cinco categorias: custo, segurança, confiabilidade, desempenho e excelência operacional.'},
+  {text:'O Azure Monitor coleta métricas e logs de aplicações e infraestrutura para análise e alertas.', answer:true, why:'Essa é a função central do Azure Monitor.'}
+]},
+{domain:'gov', type:'yesno', q:'Avalie se cada afirmação abaixo é verdadeira (Sim) ou falsa (Não).', context:'Uma empresa está avaliando como gerenciar múltiplas assinaturas do Azure.', statements:[
+  {text:'Um Grupo de Gerenciamento pode conter várias assinaturas e aplicar políticas a todas elas de uma vez.', answer:true, why:'Essa é a finalidade dos Grupos de Gerenciamento.'},
+  {text:'Cada assinatura do Azure pode pertencer a mais de um Grupo de Gerenciamento ao mesmo tempo.', answer:false, why:'Uma assinatura pertence a apenas um Grupo de Gerenciamento por vez.'},
+  {text:'Modelos ARM permitem declarar a infraestrutura desejada em um arquivo JSON para implantações repetíveis.', answer:true, why:'Essa é a definição de ARM templates como Infraestrutura como Código.'}
+]},
+
+/* ===== MULTI-SELECT (10) ===== */
+{domain:'cloud', type:'multi', q:'Quais das opções abaixo são benefícios geralmente associados à computação em nuvem?', note:'Selecione 3 opções corretas.', options:['Elasticidade','Agilidade','Eliminação total da necessidade de segurança','Alta disponibilidade','Garantia de zero custo operacional'], correct:[0,1,3], exp:'Segurança continua sendo responsabilidade compartilhada entre cliente e provedor, e a nuvem não elimina custo — ela o transforma em OpEx, não o zera.'},
+{domain:'cloud', type:'multi', q:'Quais das afirmações abaixo descrevem corretamente o modelo SaaS?', note:'Selecione 2 opções corretas.', options:['O provedor gerencia toda a infraestrutura, o sistema operacional e a própria aplicação','O cliente precisa instalar e corrigir (patch) o sistema operacional','O software é entregue pronto para uso, geralmente por assinatura','O cliente tem controle total sobre o código-fonte da aplicação'], correct:[0,2], exp:'As opções B e D descrevem IaaS ou desenvolvimento próprio, não SaaS, onde o cliente apenas usa o software já pronto.'},
+{domain:'cloud', type:'multi', q:'Qual das opções a seguir é um exemplo de despesa operacional (OpEx), e não de despesa de capital (CapEx)?', note:'Selecione 2 opções corretas.', options:['Comprar um servidor físico para o data center','Assinar uma VM no Azure cobrada por hora','Construir um novo data center próprio','Pagar uma assinatura mensal do Microsoft 365'], correct:[1,3], exp:'Comprar servidores e construir um data center são investimentos de capital (CapEx); pagar por consumo contínuo, como uma VM por hora ou uma assinatura mensal, é OpEx.'},
+{domain:'arch', type:'multi', q:'Quais das opções abaixo são exemplos de serviços de computação do Azure?', note:'Selecione 3 opções corretas.', options:['Azure Virtual Machines','Azure Blob Storage','Azure App Service','Azure Functions','Azure Virtual Network'], correct:[0,2,3], exp:'Blob Storage é um serviço de armazenamento e Virtual Network é um serviço de rede — nenhum dos dois é computação.'},
+{domain:'arch', type:'multi', q:'Quais das opções a seguir são opções válidas de redundância de armazenamento no Azure?', note:'Selecione 3 opções corretas.', options:['LRS','ZRS','GRS','FRS','TRS'], correct:[0,1,2], exp:'FRS e TRS não são opções reais de redundância do Azure; as válidas incluem LRS, ZRS, GRS e RA-GRS.'},
+{domain:'arch', type:'multi', q:'Quais das afirmações abaixo são verdadeiras sobre Zonas de Disponibilidade?', note:'Selecione 2 opções corretas.', options:['Cada zona tem energia, refrigeração e rede independentes','Todas as regiões do Azure possuem Zonas de Disponibilidade','Zonas de disponibilidade protegem contra a falha de um data center inteiro dentro da região','Zonas de disponibilidade substituem a necessidade de backup de dados'], correct:[0,2], exp:'Nem toda região do Azure tem zonas de disponibilidade, e zonas não substituem backup — elas protegem contra falha de infraestrutura física, não contra exclusão ou corrupção de dados.'},
+{domain:'arch', type:'multi', q:'Quais das opções abaixo fazem parte do modelo de "defesa em profundidade"?', note:'Selecione 4 opções corretas.', options:['Segurança física do data center','Identidade e acesso','Perímetro de rede','Dados','Usar apenas um único firewall perimetral como camada única','Desativar toda autenticação para simplificar o acesso'], correct:[0,1,2,3], exp:'Defesa em profundidade combina camadas reais — física, identidade, perímetro e dados, entre outras. Depender de uma única camada ou remover a autenticação contraria o princípio central dessa estratégia.'},
+{domain:'gov', type:'multi', q:'Quais das ferramentas abaixo pertencem à categoria de gerenciamento de custos e governança do Azure?', note:'Selecione 3 opções corretas.', options:['Azure Cost Management + Billing','Azure Policy','Azure Blueprints','Azure Virtual Network','Azure Load Balancer'], correct:[0,1,2], exp:'Virtual Network e Load Balancer são serviços de rede, não ferramentas de custo ou governança.'},
+{domain:'gov', type:'multi', q:'Quais das afirmações a seguir descrevem corretamente o Azure Advisor?', note:'Selecione 2 opções corretas.', options:['Analisa o uso e a configuração dos recursos para sugerir melhorias','Garante automaticamente que todas as recomendações sejam aplicadas sem intervenção humana','Cobre recomendações de custo, segurança, confiabilidade, desempenho e excelência operacional','É a única forma de aplicar políticas de conformidade no Azure'], correct:[0,2], exp:'O Advisor apenas recomenda — não aplica automaticamente as mudanças — e não é a ferramenta de aplicação de políticas, papel que cabe ao Azure Policy.'},
+{domain:'gov', type:'multi', q:'Quais das opções abaixo são exemplos de ferramentas de Infraestrutura como Código ou de implantação consistente no Azure?', note:'Selecione 2 opções corretas.', options:['Modelos do Azure Resource Manager (ARM templates)','Azure Blueprints','Azure Service Health','Azure Advisor'], correct:[0,1], exp:'Service Health e Advisor são ferramentas de monitoramento e recomendação, não de definição ou implantação de infraestrutura.'}
+];
+
+const DOMAIN_INFO = {
+  cloud:{label:'Conceitos de nuvem', cls:'cloud'},
+  arch:{label:'Arquitetura e serviços', cls:'arch'},
+  gov:{label:'Gestão e governança', cls:'gov'}
+};
+const FORMAT_LABEL = {single:'Cenário', multi:'Múltipla seleção', yesno:'Sim / Não'};
+const LETTERS = ['A','B','C','D','E','F'];
+const TOTAL = QUESTIONS.length;
+const DURATION = 75*60;
+
+let order = [];
+let answers = new Array(TOTAL).fill(null);
+let current = 0;
+let timeLeft = DURATION;
+let timerId = null;
+let finished = false;
+
+const $ = (id) => document.getElementById(id);
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function initAnswers(){
+  return order.map(idx=>{
+    const q = QUESTIONS[idx];
+    if(q.type==='yesno') return new Array(q.statements.length).fill(null);
+    return null;
+  });
+}
+
+function startExam(){
+  order = shuffle([...Array(TOTAL).keys()]);
+  answers = initAnswers();
+  current = 0;
+  timeLeft = DURATION;
+  finished = false;
+  $('screen-intro').hidden = true;
+  $('screen-results').hidden = true;
+  $('screen-exam').hidden = false;
+  buildNav();
+  renderQuestion();
+  updateProgress();
+  clearInterval(timerId);
+  updateTimer();
+  timerId = setInterval(tick, 1000);
+}
+
+function tick(){
+  timeLeft--;
+  updateTimer();
+  if(timeLeft<=0){
+    clearInterval(timerId);
+    finishExam(true);
+  }
+}
+
+function fmtTime(s){
+  const m = Math.max(0,Math.floor(s/60));
+  const ss = Math.max(0,s%60);
+  return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+}
+
+function updateTimer(){
+  const pill = $('timer-pill');
+  pill.textContent = fmtTime(timeLeft);
+  pill.classList.toggle('low', timeLeft<=300);
+}
+
+function buildNav(){
+  const grid = $('nav-grid');
+  const strip = $('nav-strip');
+  grid.innerHTML = '';
+  strip.innerHTML = '';
+  for(let i=0;i<TOTAL;i++){
+    const b1 = document.createElement('button');
+    b1.className = 'nq';
+    b1.textContent = i+1;
+    b1.addEventListener('click', ()=>{ current=i; renderQuestion(); });
+    grid.appendChild(b1);
+    const b2 = b1.cloneNode(true);
+    b2.addEventListener('click', ()=>{ current=i; renderQuestion(); });
+    strip.appendChild(b2);
+  }
+}
+
+function refreshNav(){
+  [$('nav-grid'), $('nav-strip')].forEach(container=>{
+    Array.from(container.children).forEach((btn,i)=>{
+      btn.classList.toggle('answered', isAnswered(i));
+      btn.classList.toggle('current', i===current);
+    });
+  });
+}
+
+function isAnswered(p){
+  const q = QUESTIONS[order[p]];
+  const a = answers[p];
+  if(q.type==='single') return a!==null;
+  if(q.type==='multi') return a!==null;
+  if(q.type==='yesno') return a!==null && a.every(v=>v!==null);
+  return false;
+}
+
+function isCorrect(p){
+  const q = QUESTIONS[order[p]];
+  const a = answers[p];
+  if(!isAnswered(p)) return false;
+  if(q.type==='single') return a===q.correct;
+  if(q.type==='multi'){
+    const s1 = a.slice().sort().join(',');
+    const s2 = q.correct.slice().sort().join(',');
+    return s1===s2;
+  }
+  if(q.type==='yesno') return q.statements.every((st,i)=>a[i]===st.answer);
+  return false;
+}
+
+function renderQuestion(){
+  const qi = order[current];
+  const q = QUESTIONS[qi];
+  const info = DOMAIN_INFO[q.domain];
+  const tag = $('q-tag');
+  tag.textContent = info.label;
+  tag.className = 'tag ' + info.cls;
+  $('q-fmt').textContent = FORMAT_LABEL[q.type];
+  $('q-num').textContent = 'Questão '+(current+1)+' de '+TOTAL;
+  $('q-text').textContent = q.q;
+
+  const body = $('q-body');
+  body.innerHTML = '';
+
+  if(q.type==='single'){
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    q.options.forEach((text, idx)=>{
+      const label = document.createElement('label');
+      label.className = 'option' + (answers[current]===idx ? ' selected' : '');
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'opt';
+      input.checked = answers[current]===idx;
+      input.addEventListener('change', ()=>{
+        answers[current] = idx;
+        renderQuestion();
+        updateProgress();
+        refreshNav();
+      });
+      const letter = document.createElement('span');
+      letter.className = 'letter';
+      letter.textContent = LETTERS[idx];
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = text;
+      label.appendChild(input);
+      label.appendChild(letter);
+      label.appendChild(span);
+      opts.appendChild(label);
+    });
+    body.appendChild(opts);
+
+  } else if(q.type==='multi'){
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = q.note;
+    body.appendChild(hint);
+
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    const sel = answers[current] || [];
+    q.options.forEach((text, idx)=>{
+      const label = document.createElement('label');
+      label.className = 'option' + (sel.includes(idx) ? ' selected' : '');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = sel.includes(idx);
+      input.addEventListener('change', ()=>{
+        let cur = (answers[current] || []).slice();
+        if(input.checked){ if(!cur.includes(idx)) cur.push(idx); }
+        else { cur = cur.filter(v=>v!==idx); }
+        answers[current] = cur;
+        renderQuestion();
+        updateProgress();
+        refreshNav();
+      });
+      const letter = document.createElement('span');
+      letter.className = 'letter';
+      letter.textContent = LETTERS[idx];
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = text;
+      label.appendChild(input);
+      label.appendChild(letter);
+      label.appendChild(span);
+      opts.appendChild(label);
+    });
+    body.appendChild(opts);
+
+  } else if(q.type==='yesno'){
+    const scenario = document.createElement('div');
+    scenario.className = 'scenario';
+    scenario.textContent = q.context;
+    body.appendChild(scenario);
+
+    if(answers[current]===null) answers[current] = new Array(q.statements.length).fill(null);
+    q.statements.forEach((st, idx)=>{
+      const row = document.createElement('div');
+      row.className = 'statement-row';
+      const txt = document.createElement('div');
+      txt.className = 'stext';
+      txt.textContent = (idx+1)+'. '+st.text;
+      const yn = document.createElement('div');
+      yn.className = 'yn';
+      const yesBtn = document.createElement('button');
+      yesBtn.type = 'button';
+      yesBtn.textContent = 'Sim';
+      const noBtn = document.createElement('button');
+      noBtn.type = 'button';
+      noBtn.textContent = 'Não';
+      const cur = answers[current][idx];
+      if(cur===true) yesBtn.classList.add('active-yes');
+      if(cur===false) noBtn.classList.add('active-no');
+      yesBtn.addEventListener('click', ()=>{ answers[current][idx]=true; renderQuestion(); updateProgress(); refreshNav(); });
+      noBtn.addEventListener('click', ()=>{ answers[current][idx]=false; renderQuestion(); updateProgress(); refreshNav(); });
+      yn.appendChild(yesBtn);
+      yn.appendChild(noBtn);
+      row.appendChild(txt);
+      row.appendChild(yn);
+      body.appendChild(row);
+    });
+  }
+
+  $('btn-prev').disabled = current===0;
+  $('btn-next').disabled = current===TOTAL-1;
+  refreshNav();
+}
+
+function updateProgress(){
+  let n = 0;
+  for(let p=0;p<TOTAL;p++){ if(isAnswered(p)) n++; }
+  $('progress-pill').textContent = n+'/'+TOTAL+' respondidas';
+}
+
+function openModal(){
+  let n = 0;
+  for(let p=0;p<TOTAL;p++){ if(isAnswered(p)) n++; }
+  $('modal-text').textContent = 'Você respondeu '+n+' de '+TOTAL+' itens.' + (n<TOTAL ? ' Os itens incompletos contarão como erro.' : '');
+  $('modal-overlay').hidden = false;
+}
+
+function finishExam(auto){
+  finished = true;
+  clearInterval(timerId);
+  $('modal-overlay').hidden = true;
+  $('screen-exam').hidden = true;
+  $('screen-results').hidden = false;
+  $('review-list').hidden = true;
+  $('btn-review').textContent = 'Ver revisão completa';
+  renderResults(auto);
+}
+
+function computeScores(){
+  const domainTotals = {cloud:{c:0,t:0}, arch:{c:0,t:0}, gov:{c:0,t:0}};
+  let correct = 0;
+  for(let p=0;p<TOTAL;p++){
+    const q = QUESTIONS[order[p]];
+    const ok = isCorrect(p);
+    domainTotals[q.domain].t++;
+    if(ok){ domainTotals[q.domain].c++; correct++; }
+  }
+  return {correct, domainTotals};
+}
+
+function statusFor(pct){
+  if(pct>=70) return 'good';
+  if(pct>=50) return 'warning';
+  return 'critical';
+}
+
+function renderResults(auto){
+  const {correct, domainTotals} = computeScores();
+  const pct = Math.round(correct/TOTAL*100);
+  $('score-ring').style.setProperty('--pct', pct);
+  $('score-pct').textContent = pct+'%';
+  $('score-frac').textContent = correct+'/'+TOTAL;
+
+  const chip = $('status-chip');
+  const pass = pct>=70;
+  chip.className = 'status-chip ' + (pass?'pass':'fail');
+  chip.textContent = (pass? '✓ Aprovado (referência)':'✕ Abaixo da nota mínima');
+  $('score-detail').textContent = (auto? 'Tempo esgotado — simulado finalizado automaticamente. ':'') +
+    (pass
+      ? 'Desempenho equivalente a uma nota de aprovação na prova real (mínimo de referência: 70% / 700 pontos).'
+      : 'Desempenho abaixo da nota mínima de referência (70% / 700 pontos). Revise os domínios mais fracos abaixo.');
+
+  const holder = $('bars-holder');
+  holder.innerHTML = '';
+  ['cloud','arch','gov'].forEach(key=>{
+    const d = domainTotals[key];
+    const dpct = d.t ? Math.round(d.c/d.t*100) : 0;
+    const info = DOMAIN_INFO[key];
+    const st = statusFor(dpct);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML =
+      '<div class="label"><i style="background:var(--'+info.cls+')"></i>'+info.label+'</div>'+
+      '<div class="bar-track"><div class="bar-fill '+st+'" style="width:'+dpct+'%"></div></div>'+
+      '<div class="barnum">'+d.c+'/'+d.t+' · '+dpct+'%</div>';
+    holder.appendChild(row);
+  });
+
+  renderReview();
+}
+
+function renderReview(){
+  const holder = $('review-holder');
+  holder.innerHTML = '';
+  for(let p=0;p<TOTAL;p++){
+    const q = QUESTIONS[order[p]];
+    const info = DOMAIN_INFO[q.domain];
+    const a = answers[p];
+    const ok = isCorrect(p);
+    const det = document.createElement('details');
+    det.className = 'review-item';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = '<span class="mark '+(ok?'ok':'no')+'">'+(ok?'✓':'✕')+'</span>'+
+      '<span class="tag '+info.cls+'">'+info.label+'</span>'+
+      '<span class="tag fmt">'+FORMAT_LABEL[q.type]+'</span>'+
+      '<span class="sumtext">'+(p+1)+'. '+q.q+'</span>';
+    det.appendChild(summary);
+
+    const body = document.createElement('div');
+    body.className = 'review-body';
+    const qt = document.createElement('div');
+    qt.className = 'qtext';
+    qt.textContent = q.q;
+    body.appendChild(qt);
+
+    if(q.type==='single'){
+      const optsWrap = document.createElement('div');
+      optsWrap.className = 'options';
+      q.options.forEach((text, idx)=>{
+        const row = document.createElement('div');
+        let cls = 'option';
+        if(idx===q.correct) cls += ' correct';
+        else if(idx===a) cls += ' incorrect';
+        row.className = cls;
+        row.innerHTML = '<span class="letter">'+LETTERS[idx]+'</span><span class="option-text">'+text+'</span>';
+        optsWrap.appendChild(row);
+      });
+      body.appendChild(optsWrap);
+      const ansLine = document.createElement('div');
+      ansLine.className = 'review-answers';
+      ansLine.innerHTML = '<span class="'+(a===null?'':(ok?'yours right':'yours wrong'))+'">Sua resposta: '+(a===null?'em branco':(LETTERS[a]+' — '+q.options[a]))+'</span>'+
+        (ok?'':'<span class="correct-line">Resposta correta: '+LETTERS[q.correct]+' — '+q.options[q.correct]+'</span>');
+      body.appendChild(ansLine);
+      const exp = document.createElement('div');
+      exp.className = 'explanation';
+      exp.innerHTML = '<b>Explicação</b>'+q.exp;
+      body.appendChild(exp);
+
+    } else if(q.type==='multi'){
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.textContent = q.note;
+      body.appendChild(hint);
+      const sel = a || [];
+      const optsWrap = document.createElement('div');
+      optsWrap.className = 'options';
+      q.options.forEach((text, idx)=>{
+        const row = document.createElement('div');
+        let cls = 'option';
+        if(q.correct.includes(idx)) cls += ' correct';
+        else if(sel.includes(idx)) cls += ' incorrect';
+        row.className = cls;
+        row.innerHTML = '<span class="letter">'+LETTERS[idx]+'</span><span class="option-text">'+text+'</span>';
+        optsWrap.appendChild(row);
+      });
+      body.appendChild(optsWrap);
+      const ansLine = document.createElement('div');
+      ansLine.className = 'review-answers';
+      const yourLetters = sel.length ? sel.map(i=>LETTERS[i]).join(', ') : 'em branco';
+      const correctLetters = q.correct.map(i=>LETTERS[i]).join(', ');
+      ansLine.innerHTML = '<span class="'+(sel.length===0?'':(ok?'yours right':'yours wrong'))+'">Você selecionou: '+yourLetters+'</span>'+
+        (ok?'':'<span class="correct-line">Alternativas corretas: '+correctLetters+'</span>');
+      body.appendChild(ansLine);
+      const exp = document.createElement('div');
+      exp.className = 'explanation';
+      exp.innerHTML = '<b>Explicação</b>'+q.exp;
+      body.appendChild(exp);
+
+    } else if(q.type==='yesno'){
+      const scenario = document.createElement('div');
+      scenario.className = 'scenario';
+      scenario.textContent = q.context;
+      body.appendChild(scenario);
+      const userAns = a || new Array(q.statements.length).fill(null);
+      q.statements.forEach((st, idx)=>{
+        const match = userAns[idx]===st.answer;
+        const row = document.createElement('div');
+        row.className = 'statement-row ' + (match ? 'review-ok' : 'review-no');
+        const yourLabel = userAns[idx]===null ? 'em branco' : (userAns[idx] ? 'Sim' : 'Não');
+        const correctLabel = st.answer ? 'Sim' : 'Não';
+        row.innerHTML =
+          '<div class="stext">'+(idx+1)+'. '+st.text+
+            '<div class="stwhy">Sua resposta: <b>'+yourLabel+'</b>'+(match?'':' · Correta: <b>'+correctLabel+'</b>')+' — '+st.why+'</div>'+
+          '</div>';
+        body.appendChild(row);
+      });
+    }
+
+    det.appendChild(body);
+    holder.appendChild(det);
+  }
+}
+
+function resetAll(){
+  $('screen-results').hidden = true;
+  $('screen-exam').hidden = true;
+  $('screen-intro').hidden = false;
+}
+
+$('btn-start').addEventListener('click', startExam);
+$('btn-prev').addEventListener('click', ()=>{ if(current>0){ current--; renderQuestion(); } });
+$('btn-next').addEventListener('click', ()=>{ if(current<TOTAL-1){ current++; renderQuestion(); } });
+$('btn-finish').addEventListener('click', openModal);
+$('modal-cancel').addEventListener('click', ()=>{ $('modal-overlay').hidden = true; });
+$('modal-confirm').addEventListener('click', ()=>finishExam(false));
+$('btn-retry').addEventListener('click', resetAll);
+$('btn-review').addEventListener('click', ()=>{
+  const list = $('review-list');
+  list.hidden = !list.hidden;
+  $('btn-review').textContent = list.hidden ? 'Ver revisão completa' : 'Ocultar revisão';
+  if(!list.hidden) list.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+if(window.claude && window.claude.hot){
+  window.claude.hot.snapshot(()=>({answers, order, current, timeLeft, finished}));
+}
+</script>
+
+</body></html>
