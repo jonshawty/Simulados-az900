@@ -2,7 +2,9 @@
 
 Dois simulados interativos para a certificação **Microsoft Certified: Azure Fundamentals (AZ-900)**, feitos em HTML/CSS/JS puro — sem dependências, sem build, basta abrir no navegador.
 
-Usei os dois para estudar e fui aprovado na prova real com **810/1000**.
+Usei os dois para estudar juntamente com o curso abaixo e fui aprovado na prova real com **880/1000**.
+
+https://youtu.be/4ub1uGKQK6U?si=rfGdmA5V7p8Fu9vh
 
 ## Sobre
 
